@@ -27,3 +27,5 @@ jobs:
         with:
           name: macos-build
           path: dist/
+
+# Forzar actualización de GitHub Actions

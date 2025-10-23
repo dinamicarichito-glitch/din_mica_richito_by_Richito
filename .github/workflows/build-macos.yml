@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: macos-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,3 +32,4 @@ jobs:
           path: dist/
 
 # Forzar actualización de GitHub Actions
+

@@ -20,6 +20,11 @@
   "build": {
     "appId": "com.richito.dinamica",
     "productName": "Dinámica Richito",
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities",
+      "icon": "icon.ico"
+    },
     "win": {
       "target": "nsis",
       "icon": "icon.ico"

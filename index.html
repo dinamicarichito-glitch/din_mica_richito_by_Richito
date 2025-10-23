@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinámica Richito</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+      "imports": {
+        "canvas-confetti": "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.module.mjs"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <img src="logo.png" alt="Richito Logo" class="logo" id="header-logo">
+            <h1 id="header-title">Dinámica Richito <span id="dinamica-number"></span></h1>
+            <div id="pancitos-display">
+                <span id="pancitos-value">5</span>
+                <p>Pancitos</p>
+            </div>
+        </header>
+
+        <section id="controls" style="display: none;">
+            <label for="valor-pan">Pancitos:</label>
+            <select id="valor-pan">
+                <option value="5">5 panes</option>
+                <option value="7">7 panes</option>
+                <option value="10">10 panes</option>
+                <option value="12">12 panes</option>
+                <option value="15">15 panes</option>
+            </select>
+        </section>
+        
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <section id="prizes">
+            <div class="prize-container" id="prize-container">
+                <!-- Los premios se generarán aquí con JS -->
+            </div>
+        </section>
+
+        <main id="cards-container">
+            <!-- Las 16 cartillas se generarán aquí con JS -->
+        </main>
+
+        <footer>
+            <div class="footer-buttons">
+                <button id="settings-button" title="Configurar">⚙️</button>
+                <button id="clear-button" title="Limpiar">🧹</button>
+                <button id="undo-button" title="Deshacer" style="display: none;">↩️</button>
+                <button id="save-button" title="Guardar">💾</button>
+                <button id="history-button" title="Ver Última Jugada">⏳</button>
+                <button id="manage-players-button" title="Bolsas y Envios">💰</button>
+                <button id="profit-details-button" title="Ver Ganancias">👁️</button>
+                <button id="reset-day-button" title="Reiniciar Día">🔄</button>
+            </div>
+            <div id="accumulated-profit-display" class="accumulated-profit"></div>
+            <p class="note"></p>
+        </footer>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <p id="modal-message"></p>
+            <div id="modal-buttons"></div>
+        </div>
+    </div>
+
+    <div id="player-management-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <button id="close-player-modal-button" class="close-button">&times;</button>
+            <h2>Gestión de Goleadores</h2>
+            <div class="tabs">
+                <button class="tab-button active" data-tab="balances">Bolsas Actuales</button>
+                <button class="tab-button" data-tab="history">Historia de Envios</button>
+            </div>
+            <div id="balances-tab" class="tab-content active">
+                <div class="balances-header">
+                    <span id="sort-by-name" class="sortable-header" data-sort="name">Goleador <span class="sort-arrow"></span></span>
+                    <span id="sort-by-balance" class="sortable-header" data-sort="balance">Bolsa <span class="sort-arrow"></span></span>
+                    <span></span> <!-- Placeholder for button column -->
+                </div>
+                <div id="player-balances-list">
+                    <!-- Player balances will be rendered here by script.js -->
+                </div>
+            </div>
+            <div id="history-tab" class="tab-content">
+                 <ul id="payment-history-list">
+                    <!-- Payment history will be rendered here by script.js -->
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <!-- El botón de guardar se movió al footer principal -->
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <button id="close-settings-modal-button" class="close-button">&times;</button>
+            <h2>Configuración de la Dinámica</h2>
+            <fieldset class="settings-fieldset" id="settings-header-fieldset">
+                <legend>Cabecera</legend>
+                <div class="form-group full-width">
+                    <label for="config-title">Título de la dinámica:</label>
+                    <input type="text" id="config-title">
+                </div>
+                <div class="form-group full-width">
+                    <label for="config-logo-upload">Logo de la dinámica:</label>
+                    <input type="file" id="config-logo-upload" accept="image/*" style="display: none;">
+                    <button id="change-logo-button" class="modal-button secondary">Cambiar Logo</button>
+                    <p class="form-note">La imagen recomendada es de 550px de ancho y 690px de alto. Si subes una imagen más grande, será ajustada automáticamente.</p>
+                </div>
+            </fieldset>
+            <div class="settings-container">
+                <div class="settings-form">
+                    
+                    <fieldset class="settings-fieldset">
+                        <legend>Juego</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="config-pancitos">Valor:</label>
+                                <input type="number" id="config-pancitos" min="0" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-cols">Columnas:</label>
+                                <input type="number" id="config-cols" min="1" max="5" value="3">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-rows">Filas:</label>
+                                <input type="number" id="config-rows" min="1" max="6" value="4">
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="config-prizes">Premios (separados por coma):</label>
+                            <input type="text" id="config-prizes" placeholder="Ej: 50, 30, 20, 10">
+                        </div>
+                    </fieldset>
+                    <fieldset class="settings-fieldset">
+                        <legend>Colores</legend>
+                        <div class="form-group full-width color-picker-group">
+                            <label>Color del Título:</label>
+                            <div class="color-picker-container">
+                                <div class="color-swatch-display" id="title-color-display" data-picker="title"></div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width color-picker-group">
+                            <label>Color del Texto de Premios:</label>
+                             <div class="color-picker-container">
+                                <div class="color-swatch-display" id="prize-text-color-display" data-picker="prizeText"></div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width color-picker-group">
+                            <label>Color del Fondo de Premios:</label>
+                            <div class="color-picker-container">
+                                <div class="color-swatch-display" id="prize-bg-color-display" data-picker="prizeBg"></div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width color-picker-group">
+                            <label>Color de las Cartillas:</label>
+                            <div class="color-picker-container">
+                                <div class="color-swatch-display" id="card-color-display" data-picker="card"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="reset-colors-button" class="modal-button secondary small">Restablecer Colores</button>
+                        </div>
+                    </fieldset>
+                </div>
+                <div id="settings-preview-panel">
+                    <h4>Vista Previa</h4>
+                    <div class="preview-container">
+                         <header class="preview-header">
+                            <img id="preview-logo" src="logo.png" alt="Logo" class="logo">
+                            <h1 id="preview-title">Dinámica Richito</h1>
+                        </header>
+                        <section class="preview-prizes-section">
+                            <div id="preview-prizes-container" class="prize-container">
+                                <!-- Preview prizes rendered by JS -->
+                            </div>
+                        </section>
+                        <main id="preview-cards-container">
+                            <!-- Preview cards rendered by JS -->
+                        </main>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="config-unit-button" class="modal-button secondary">⚙ Unidad</button>
+                <button id="apply-settings-button" class="modal-button primary">Aplicar y Reiniciar Juego</button>
+            </div>
+            <div id="color-picker-popup" class="color-picker-popup">
+                <!-- Color swatches will be generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="unit-config-popup" class="modal-overlay" style="display: none;">
+        <div class="modal-content compact-popup">
+            <h3>Configurar Unidad</h3>
+            <div class="form-group full-width">
+                <label for="unit-input">Nombre de la unidad:</label>
+                <input type="text" id="unit-input" placeholder="Ej: panes, puntos">
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-unit-button" class="modal-button secondary">Cancelar</button>
+                <button id="save-unit-button" class="modal-button primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <button id="close-history-modal-button" class="close-button">&times;</button>
+            <h2>Últimas Jugadas Guardadas</h2>
+            <div id="history-carousel">
+                <div id="history-content">
+                    <!-- Previous game state will be rendered here -->
+                </div>
+                <div id="history-navigation" style="display: none;">
+                    <button id="history-prev-button" class="modal-button secondary">&lt; Anterior</button>
+                    <span id="history-page-indicator">1 / 5</span>
+                    <button id="history-next-button" class="modal-button secondary">Siguiente &gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profit-details-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <button id="close-profit-modal-button" class="close-button">&times;</button>
+            <h2>Detalle de Ganancias</h2>
+            <div id="profit-details-content" class="profit-details-content">
+                <!-- Profit details will be rendered here -->
+            </div>
+            <div id="profit-total" class="profit-total">
+                <!-- Total profit will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <datalist id="player-names-list"></datalist>
+
+    <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
